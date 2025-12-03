@@ -1,0 +1,5 @@
+{
+  "name": "Library Pathfinder",
+  "description": "Interactive library floor plan mapper helping users locate specific bookshelves based on call numbers.",
+  "requestFramePermissions": []
+}
