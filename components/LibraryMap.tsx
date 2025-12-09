@@ -58,7 +58,7 @@ export const LibraryMap: React.FC<LibraryMapProps> = ({ selectedShelves }) => {
         preserveAspectRatio="xMidYMid meet"
       >
         {/* Background floor plan */}
-        <image href="/map.jpg" x="0" y="0" width="1000" height="750" />
+        <image href="/map.png" x="0" y="0" width="1000" height="750" />
 
         {/* Annexe arrow indicator */}
         {showAnnexeArrow && (
@@ -69,17 +69,17 @@ export const LibraryMap: React.FC<LibraryMapProps> = ({ selectedShelves }) => {
               stroke="#166534"
               strokeWidth="2"
             />
-          <text
-            x="70"
-            y="0"
-            fontSize="14"
-            fontWeight="bold"
-            fill="#002147"
-            textAnchor="start"
-            dominantBaseline="middle"
-          >
-            Annexe
-          </text>
+            <text
+              x="70"
+              y="0"
+              fontSize="14"
+              fontWeight="bold"
+              fill="#002147"
+              textAnchor="start"
+              dominantBaseline="middle"
+            >
+              Annexe
+            </text>
           </g>
         )}
 
