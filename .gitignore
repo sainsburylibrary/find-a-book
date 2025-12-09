@@ -15,7 +15,6 @@ dist-ssr
 
 /build
 /dist
-/docs
 
 /coverage
 /.vite
