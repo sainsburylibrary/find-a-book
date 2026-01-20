@@ -1,16 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { SHELF_DATA } from './constants';
 import { LibraryMap } from './components/LibraryMap';
 
 export default function App() {
   const [selectedShelfIds, setSelectedShelfIds] = useState<string[]>([]);
+  const timersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach(timer => clearTimeout(timer));
+    };
+  }, []);
 
   const toggleShelf = (id: string) => {
-    setSelectedShelfIds(prev => 
-      prev.includes(id) 
-        ? prev.filter(shelfId => shelfId !== id)
-        : [...prev, id]
-    );
+    setSelectedShelfIds(prev => {
+      if (prev.includes(id)) {
+        // Deselecting: clear the timer if it exists
+        const existingTimer = timersRef.current.get(id);
+        if (existingTimer) {
+          clearTimeout(existingTimer);
+          timersRef.current.delete(id);
+        }
+        return prev.filter(shelfId => shelfId !== id);
+      } else {
+        // Selecting: set a timer to auto-remove after 5 seconds
+        const existingTimer = timersRef.current.get(id);
+        if (existingTimer) {
+          clearTimeout(existingTimer);
+        }
+        const timer = setTimeout(() => {
+          setSelectedShelfIds(current => current.filter(shelfId => shelfId !== id));
+          timersRef.current.delete(id);
+        }, 5000);
+        timersRef.current.set(id, timer);
+        return [...prev, id];
+      }
+    });
   };
 
   const selectedShelves = SHELF_DATA.filter((s) => selectedShelfIds.includes(s.id));

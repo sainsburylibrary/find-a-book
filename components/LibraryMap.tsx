@@ -32,7 +32,7 @@ export const LibraryMap: React.FC<LibraryMapProps> = ({ selectedShelves }) => {
             next.delete(id);
             return next;
           });
-        }, 7500);
+        }, 5000);
       });
     }
 
