@@ -7,6 +7,7 @@ interface LibraryMapProps {
 
 export const LibraryMap = ({ selectedShelves }: LibraryMapProps) => {
   const [flashingIds, setFlashingIds] = useState<Set<string>>(new Set());
+  const [latestId, setLatestId] = useState<string | null>(null);
   const prevSelectedRef = useRef<Set<string>>(new Set());
 
   const showAnnexeArrow = selectedShelves.some((s) => s.section === "Annexe");
@@ -19,6 +20,8 @@ export const LibraryMap = ({ selectedShelves }: LibraryMapProps) => {
       .map((s) => s.id);
 
     if (newIds.length > 0) {
+      setLatestId(newIds[newIds.length - 1]);
+
       setFlashingIds((prev) => {
         const next = new Set(prev);
         newIds.forEach((id) => next.add(id));
@@ -49,6 +52,16 @@ export const LibraryMap = ({ selectedShelves }: LibraryMapProps) => {
         }
         .animate-subtle-flash {
           animation: subtle-pulse 2s ease-in-out infinite;
+        }
+        @keyframes you-are-here-pulse {
+          0%   { transform: scale(1);    opacity: 1;   }
+          50%  { transform: scale(1.01); opacity: 0.65; }
+          100% { transform: scale(1);    opacity: 1;   }
+        }
+        .animate-you-are-here {
+          animation: you-are-here-pulse 3.2s ease-in-out infinite;
+          transform-origin: 0px 0px;
+          transform-box: fill-box;
         }
       `}</style>
       <svg
@@ -85,11 +98,11 @@ export const LibraryMap = ({ selectedShelves }: LibraryMapProps) => {
 
         {/* "YOU ARE HERE" Marker - Centered Horizontally */}
         {/* Moved left (470 -> 460) and down (612 -> 616) */}
-        <g transform="translate(460, 616)">
+        <g transform="translate(498, 610)">
           {/* Long Thin Rectangle (Desk/Counter) */}
           {/* Moved 3px UP (-50 -> -53) and 10px RIGHT (-55 -> -45) */}
           <rect
-            x="-45"
+            x="-40"
             y="-53"
             width="80"
             height="8"
@@ -99,6 +112,7 @@ export const LibraryMap = ({ selectedShelves }: LibraryMapProps) => {
           />
 
           {/* Push Pin Icon (Tip at 0,0) */}
+          <g className="animate-you-are-here">
           <path
             d="M 0 0 L -12 -28 A 12 12 0 1 1 12 -28 L 0 0 Z"
             fill="#c02653"
@@ -119,62 +133,65 @@ export const LibraryMap = ({ selectedShelves }: LibraryMapProps) => {
           >
             YOU ARE HERE
           </text>
+          </g>
         </g>
 
         {/* Selected Shelf Markers (Dots) */}
-        {selectedShelves.map((shelf) => {
-          // Dynamic width calculation: 8px per char + 10px base padding. Min width 90.
-          const labelWidth = Math.max(90, shelf.label.length * 8 + 10);
-          const rectX = -labelWidth / 2;
-          const baseX = shelf.coordinates.x * 10;
-          const baseY = shelf.coordinates.y * 7.5;
+        {[...selectedShelves]
+          .sort((a, b) => (a.id === latestId ? 1 : b.id === latestId ? -1 : 0))
+          .map((shelf) => {
+            // Dynamic width calculation: 8px per char + 10px base padding. Min width 90.
+            const labelWidth = Math.max(90, shelf.label.length * 8 + 10);
+            const rectX = -labelWidth / 2;
+            const baseX = shelf.coordinates.x * 10;
+            const baseY = shelf.coordinates.y * 7.5;
 
-          return (
-            <g key={shelf.id} transform={`translate(${baseX}, ${baseY})`}>
-              {/* Subtle Flashing Animation - Custom Keyframe */}
-              {flashingIds.has(shelf.id) && (
+            return (
+              <g key={shelf.id} transform={`translate(${baseX}, ${baseY})`}>
+                {/* Subtle Flashing Animation - Custom Keyframe */}
+                {flashingIds.has(shelf.id) && (
+                  <circle
+                    r="14"
+                    fill="#c02653"
+                    className="animate-subtle-flash"
+                  />
+                )}
+
+                {/* Solid Dot Marker */}
                 <circle
-                  r="14"
+                  r="9"
                   fill="#c02653"
-                  className="animate-subtle-flash"
-                />
-              )}
-
-              {/* Solid Dot Marker */}
-              <circle
-                r="9"
-                fill="#c02653"
-                stroke="white"
-                strokeWidth="2"
-                filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.3))"
-              />
-
-              {/* Floating Label - Reduced gap (-18 -> -14) */}
-              <g transform="translate(0, -14)">
-                <rect
-                  x={rectX}
-                  y="-20"
-                  width={labelWidth}
-                  height="24"
-                  rx="4"
-                  fill="rgba(0, 33, 71, 0.9)"
                   stroke="white"
-                  strokeWidth="1"
+                  strokeWidth="2"
+                  filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.3))"
                 />
-                <text
-                  x="0"
-                  y="-4"
-                  textAnchor="middle"
-                  fill="white"
-                  fontSize="12"
-                  fontWeight="bold"
-                >
-                  {shelf.label}
-                </text>
+
+                {/* Floating Label - Reduced gap (-18 -> -14) */}
+                <g transform="translate(0, -14)">
+                  <rect
+                    x={rectX}
+                    y="-20"
+                    width={labelWidth}
+                    height="24"
+                    rx="4"
+                    fill="rgba(0, 33, 71, 0.9)"
+                    stroke="white"
+                    strokeWidth="1"
+                  />
+                  <text
+                    x="0"
+                    y="-4"
+                    textAnchor="middle"
+                    fill="white"
+                    fontSize="12"
+                    fontWeight="bold"
+                  >
+                    {shelf.label}
+                  </text>
+                </g>
               </g>
-            </g>
-          );
-        })}
+            );
+          })}
       </svg>
     </div>
   );
