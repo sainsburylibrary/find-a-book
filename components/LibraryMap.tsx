@@ -5,7 +5,7 @@ interface LibraryMapProps {
   selectedShelves: ShelfData[];
 }
 
-export const LibraryMap: React.FC<LibraryMapProps> = ({ selectedShelves }) => {
+export const LibraryMap = ({ selectedShelves }: LibraryMapProps) => {
   const [flashingIds, setFlashingIds] = useState<Set<string>>(new Set());
   const prevSelectedRef = useRef<Set<string>>(new Set());
 
